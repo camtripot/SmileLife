@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileLife — Construis ta vie</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- ===== PARTICULES FOND ===== -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- ===== PAGE D'ACCUEIL ===== -->
+    <div id="screen-home" class="screen active">
+        <div class="home-wrapper">
+            <div class="home-logo">
+                <div class="logo-icon">😊</div>
+                <h1 class="logo-title">Smile<span>Life</span></h1>
+                <p class="logo-tagline">Construis la vie la plus heureuse</p>
+            </div>
+            <div class="home-actions">
+                <button id="btn-play" class="btn-hero btn-hero-primary">
+                    <span class="btn-hero-icon">🎮</span>
+                    <span class="btn-hero-text">
+                        <strong>Jouer</strong>
+                        <small>Crée ou rejoins une partie</small>
+                    </span>
+                </button>
+                <button id="btn-rules-home" class="btn-hero btn-hero-secondary">
+                    <span class="btn-hero-icon">📖</span>
+                    <span class="btn-hero-text">
+                        <strong>Règles du jeu</strong>
+                        <small>Apprends à jouer</small>
+                    </span>
+                </button>
+            </div>
+            <div class="home-footer">
+                <p>2 à 6 joueurs · Inspiré du jeu de société SmileLife</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CHOIX HÉBERGER / REJOINDRE ===== -->
+    <div id="screen-mode" class="screen">
+        <div class="panel-page">
+            <button class="btn-back" id="btn-back-home">← Retour</button>
+            <h2 class="panel-title">Comment veux-tu jouer ?</h2>
+            <div class="mode-cards">
+                <div class="mode-card" id="btn-host">
+                    <div class="mode-card-icon">🏠</div>
+                    <h3>Héberger</h3>
+                    <p>Crée une partie et invite tes amis à rejoindre</p>
+                    <span class="mode-card-badge">Chef de partie</span>
+                </div>
+                <div class="mode-card" id="btn-join">
+                    <div class="mode-card-icon">🚪</div>
+                    <h3>Rejoindre</h3>
+                    <p>Rejoins une partie créée par un ami</p>
+                    <span class="mode-card-badge">Joueur</span>
+                </div>
+            </div>
+            <div class="mode-divider">
+                <span>ou</span>
+            </div>
+            <div class="mode-local">
+                <button class="btn-outline" id="btn-local">
+                    <span>🖥️</span> Partie locale (même écran)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== REJOINDRE UNE PARTIE ===== -->
+    <div id="screen-join" class="screen">
+        <div class="panel-page">
+            <button class="btn-back" id="btn-back-mode-join">← Retour</button>
+            <h2 class="panel-title">Rejoindre une partie</h2>
+            <div class="join-form">
+                <div class="input-group">
+                    <label>Ton pseudo</label>
+                    <input type="text" id="join-name" placeholder="Choisis un pseudo..." maxlength="15" class="input-fancy">
+                </div>
+                <div class="input-group">
+                    <label>Code de la partie</label>
+                    <input type="text" id="join-code" placeholder="Ex: ABCD12" maxlength="6" class="input-fancy input-code">
+                </div>
+                <button class="btn-glow" id="btn-join-confirm">Rejoindre 🚀</button>
+                <p class="hint-text">Demande le code au chef de partie</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LOBBY (SALLE D'ATTENTE) ===== -->
+    <div id="screen-lobby" class="screen">
+        <div class="lobby-page">
+            <div class="lobby-header">
+                <div class="lobby-title-row">
+                    <h2 class="panel-title">Salle d'attente</h2>
+                    <div class="lobby-code-box">
+                        <span class="lobby-code-label">Code :</span>
+                        <span class="lobby-code" id="lobby-code">XXXX</span>
+                        <button class="btn-copy" id="btn-copy-code" title="Copier le code">📋</button>
+                    </div>
+                </div>
+                <p class="lobby-subtitle" id="lobby-status">En attente de joueurs...</p>
+            </div>
+
+            <div class="lobby-content">
+                <!-- Liste des joueurs -->
+                <div class="lobby-players">
+                    <h3>Joueurs <span id="player-count-display">(1/6)</span></h3>
+                    <div id="lobby-player-list" class="player-list"></div>
+                </div>
+
+                <!-- Paramètres (visible seulement par le chef) -->
+                <div class="lobby-settings" id="lobby-settings">
+                    <h3>Paramètres de la partie</h3>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label>Nombre de joueurs max</label>
+                            <div class="setting-selector" id="max-players-selector">
+                                <button class="setting-btn" data-val="2">2</button>
+                                <button class="setting-btn" data-val="3">3</button>
+                                <button class="setting-btn active" data-val="4">4</button>
+                                <button class="setting-btn" data-val="5">5</button>
+                                <button class="setting-btn" data-val="6">6</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>Variante</label>
+                            <div class="setting-selector" id="variant-selector">
+                                <button class="setting-btn active" data-val="classique">Classique</button>
+                                <button class="setting-btn" data-val="riviere">Rivière</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>Taille du deck</label>
+                            <div class="setting-selector" id="deck-selector">
+                                <button class="setting-btn" data-val="moitie">Moitié</button>
+                                <button class="setting-btn active" data-val="complet">Complet</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lobby-actions">
+                <button class="btn-glow btn-large" id="btn-start-game" disabled>
+                    Lancer la partie 🎲
+                </button>
+                <button class="btn-outline btn-danger-outline" id="btn-leave-lobby">Quitter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONFIGURATION LOCALE ===== -->
+    <div id="screen-local-config" class="screen">
+        <div class="panel-page">
+            <button class="btn-back" id="btn-back-mode-local">← Retour</button>
+            <h2 class="panel-title">Partie locale</h2>
+            <p class="panel-subtitle">Jouez à tour de rôle sur le même écran</p>
+
+            <div class="local-config">
+                <div class="input-group">
+                    <label>Nombre de joueurs</label>
+                    <div class="setting-selector" id="local-player-count">
+                        <button class="setting-btn" data-val="2">2</button>
+                        <button class="setting-btn active" data-val="3">3</button>
+                        <button class="setting-btn" data-val="4">4</button>
+                        <button class="setting-btn" data-val="5">5</button>
+                        <button class="setting-btn" data-val="6">6</button>
+                    </div>
+                </div>
+                <div id="local-player-names" class="local-player-names"></div>
+
+                <div class="options-summary-bar">
+                    <span class="options-summary-text" id="options-summary">Classique · Deck complet · 5 cartes · Aléatoire</span>
+                    <button class="btn-options-toggle" id="btn-options-toggle">⚙️ Options</button>
+                </div>
+
+                <button class="btn-glow btn-large" id="btn-start-local">Commencer 🎲</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TRANSITION ===== -->
+    <div id="screen-transition" class="screen">
+        <div class="transition-wrapper">
+            <div class="transition-card">
+                <div class="transition-emoji" id="transition-emoji">🎯</div>
+                <h2 id="transition-text"></h2>
+                <p class="transition-hint" id="transition-hint">Passe l'écran au joueur concerné</p>
+                <button id="btn-ready" class="btn-glow pulse">C'est parti !</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== JEU ===== -->
+    <div id="screen-game" class="screen">
+        <div class="game-header">
+            <div class="game-info">
+                <span id="current-player-name" class="current-player-label"></span>
+                <span id="game-phase" class="phase-label"></span>
+                <span id="player-score" class="score-label"></span>
+            </div>
+            <div class="deck-info">
+                <div class="deck-pile" id="deck-pile">
+                    <span class="pile-icon">🃏</span>
+                    <span id="deck-count">0</span>
+                </div>
+                <div class="deck-pile discard-pile" id="discard-pile">
+                    <span class="pile-icon">📤</span>
+                    <span id="discard-count">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-main">
+            <!-- BOARD VIEWER avec navigation -->
+            <div class="board-viewer">
+                <div class="board-nav">
+                    <button class="board-nav-arrow" id="btn-board-prev">&#9664;</button>
+                    <div class="board-nav-tabs" id="board-nav-tabs"></div>
+                    <button class="board-nav-arrow" id="btn-board-next">&#9654;</button>
+                </div>
+                <div id="player-board" class="player-board">
+                    <div class="board-group">
+                        <h3 class="board-group-title">💼 Vie Pro</h3>
+                        <div class="board-row">
+                            <div class="board-section" data-category="etudes"><h4>🎓 Études</h4><div class="board-cards"></div></div>
+                            <div class="board-section" data-category="metier"><h4>💼 Métier</h4><div class="board-cards"></div></div>
+                            <div class="board-section" data-category="salaires"><h4>💰 Salaires</h4><div class="board-cards"></div></div>
+                        </div>
+                    </div>
+                    <div class="board-group">
+                        <h3 class="board-group-title">❤️ Vie Perso</h3>
+                        <div class="board-row">
+                            <div class="board-section" data-category="flirts"><h4>😍 Flirts</h4><div class="board-cards"></div></div>
+                            <div class="board-section" data-category="mariage"><h4>💒 Mariage</h4><div class="board-cards"></div></div>
+                            <div class="board-section" data-category="enfants"><h4>👶 Enfants</h4><div class="board-cards"></div></div>
+                        </div>
+                    </div>
+                    <div class="board-group">
+                        <h3 class="board-group-title">🏆 Acquisitions</h3>
+                        <div class="board-row">
+                            <div class="board-section" data-category="animaux"><h4>🐾 Animaux</h4><div class="board-cards"></div></div>
+                            <div class="board-section" data-category="voyages"><h4>✈️ Voyages</h4><div class="board-cards"></div></div>
+                            <div class="board-section" data-category="maisons"><h4>🏠 Maisons</h4><div class="board-cards"></div></div>
+                            <div class="board-section" data-category="distinctions"><h4>🏅 Autres</h4><div class="board-cards"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANNEAU APERÇU CARTE -->
+            <div class="card-preview-panel" id="card-preview-panel">
+                <div class="card-preview-inner">
+                    <div class="card-preview-visual" id="card-preview-visual"></div>
+                    <div class="card-preview-info" id="card-preview-info"></div>
+                    <div class="card-preview-actions" id="card-preview-actions"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-area">
+            <button id="btn-draw" class="btn-action btn-action-draw">🃏 Piocher</button>
+            <button id="btn-take-discard" class="btn-action btn-action-discard-take" disabled>📤 Prendre défausse</button>
+            <button id="btn-discard" class="btn-action btn-action-discard" disabled>🗑️ Défausser</button>
+            <button id="btn-resign" class="btn-action btn-action-resign" style="display:none">📋 Démissionner</button>
+            <button id="btn-divorce" class="btn-action btn-action-divorce" style="display:none">💔 Divorcer</button>
+            <button id="btn-discard-adultery" class="btn-action btn-action-secondary" style="display:none">🚫 Stopper adultère</button>
+            <button id="btn-medium" class="btn-action btn-action-secondary" style="display:none">🔮 Voir la pioche</button>
+            <button id="btn-buy-discard" class="btn-action btn-action-secondary" style="display:none">🛒 Acheter défausse</button>
+            <button id="btn-pick-salaire" class="btn-action btn-action-secondary" style="display:none">💼 Salaire défausse</button>
+            <button id="btn-see-hands" class="btn-action btn-action-secondary" style="display:none">📰 Voir les mains</button>
+        </div>
+
+        <div class="hand-zone">
+            <div id="player-hand" class="player-hand-fan"></div>
+        </div>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+    <div id="modal-target" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-target-title">Choisir une cible</h3>
+            <div id="target-list" class="target-list"></div>
+            <button id="btn-cancel-target" class="btn-outline">Annuler</button>
+        </div>
+    </div>
+
+    <div id="modal-chance" class="modal">
+        <div class="modal-content">
+            <h3>🍀 Chance !</h3>
+            <p class="modal-desc">Choisis une carte à garder. Les autres sont défaussées.</p>
+            <div id="chance-cards" class="modal-cards"></div>
+        </div>
+    </div>
+
+    <div id="modal-etoile" class="modal">
+        <div class="modal-content modal-large">
+            <h3>🌠 Étoile filante</h3>
+            <p class="modal-desc">Choisis une carte dans la défausse à jouer immédiatement.</p>
+            <div id="etoile-cards" class="modal-cards"></div>
+            <button id="btn-cancel-etoile" class="btn-outline">Annuler</button>
+        </div>
+    </div>
+
+    <div id="modal-see-hands" class="modal">
+        <div class="modal-content modal-large">
+            <h3>📰 Journaliste — Mains des joueurs</h3>
+            <div id="see-hands-content"></div>
+            <button id="btn-close-see-hands" class="btn-outline">Fermer</button>
+        </div>
+    </div>
+
+    <div id="modal-pick-salaire" class="modal">
+        <div class="modal-content">
+            <h3>💼 Chef des ventes — Salaire défaussé</h3>
+            <p class="modal-desc">Choisissez un salaire posable de la défausse.</p>
+            <div id="pick-salaire-cards" class="modal-cards"></div>
+            <button id="btn-close-pick-salaire" class="btn-outline">Fermer</button>
+        </div>
+    </div>
+
+    <div id="modal-buy-discard" class="modal">
+        <div class="modal-content modal-large">
+            <h3>🛒 Chef des achats — Acquisitions défaussées</h3>
+            <p class="modal-desc">Choisissez un voyage ou une maison de la défausse à acheter.</p>
+            <div id="buy-discard-cards" class="modal-cards"></div>
+            <button id="btn-close-buy-discard" class="btn-outline">Fermer</button>
+        </div>
+    </div>
+
+    <div id="modal-pick-discard" class="modal">
+        <div class="modal-content modal-large">
+            <h3>🚀 Astronaute — Carte de la défausse</h3>
+            <p class="modal-desc">Choisissez une carte posable de la défausse.</p>
+            <div id="pick-discard-cards" class="modal-cards"></div>
+            <button id="btn-skip-pick-discard" class="btn-outline">Passer</button>
+        </div>
+    </div>
+
+    <div id="modal-free-maison" class="modal">
+        <div class="modal-content">
+            <h3>📐 Architecte — Maison gratuite</h3>
+            <p class="modal-desc">Choisissez une maison de votre main à poser gratuitement.</p>
+            <div id="free-maison-cards" class="modal-cards"></div>
+            <button id="btn-skip-free-maison" class="btn-outline">Passer</button>
+        </div>
+    </div>
+
+    <div id="modal-medium" class="modal">
+        <div class="modal-content modal-medium-content">
+            <h3>🔮 Médium — Prochaines cartes</h3>
+            <div class="medium-layout">
+                <div id="medium-cards" class="medium-cards-list"></div>
+                <div id="medium-info" class="medium-info-panel"></div>
+            </div>
+            <button id="btn-close-medium" class="btn-outline">Fermer</button>
+        </div>
+    </div>
+
+    <div id="modal-rules" class="modal">
+        <div class="modal-content modal-rules-content">
+            <h3>📖 Règles du jeu</h3>
+            <div class="rules-text">
+                <h4>🎯 But du jeu</h4>
+                <p>Posez des cartes pour construire votre vie et cumuler un maximum de <strong>smiles</strong> (points de bonheur). Le joueur le plus heureux gagne !</p>
+                <h4>🔄 Déroulement d'un tour</h4>
+                <ol>
+                    <li><strong>Piochez</strong> une carte du deck (ou prenez la dernière de la défausse pour la jouer immédiatement)</li>
+                    <li><strong>Posez</strong> une carte : devant vous, devant un adversaire (malus), ou dans la défausse</li>
+                </ol>
+                <p>Vous gardez toujours <strong>5 cartes en main</strong>.</p>
+                <h4>💼 Vie Professionnelle</h4>
+                <p><strong>Études</strong> (max 6) → <strong>Métier</strong> (1 seul) → <strong>Salaires</strong> (selon le niveau du métier)<br>On ne peut plus étudier avec un métier (sauf médecin/chirurgien). Pour changer : démissionner.</p>
+                <h4>❤️ Vie Personnelle</h4>
+                <p><strong>Flirts</strong> (max 5) → <strong>Mariage</strong> → <strong>Enfants</strong><br>Marié = plus de flirts (sauf adultère). Même lieu de flirt qu'un adversaire = on lui pique !</p>
+                <h4>🏠 Acquisitions</h4>
+                <p><strong>Animaux</strong> : gratuits. <strong>Voyages/Maisons</strong> : payés en investissant des salaires. Maisons à moitié prix si marié !</p>
+                <h4>📋 Démission / 💔 Divorce</h4>
+                <p>Au lieu de piocher : défaussez votre métier ou mariage, puis passez votre tour.</p>
+                <h4>🏁 Fin de partie</h4>
+                <p>La pioche est vide → chacun jette ses cartes en main → celui qui a le plus de smiles gagne !</p>
+            </div>
+            <button id="btn-close-rules" class="btn-glow">Compris ! 👍</button>
+        </div>
+    </div>
+
+    <div id="modal-options" class="modal">
+        <div class="modal-content modal-options-content">
+            <h3>⚙️ Options de la partie</h3>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <label>Variante</label>
+                    <div class="setting-selector" id="local-variant-selector">
+                        <button class="setting-btn active" data-val="classique">Classique</button>
+                        <button class="setting-btn" data-val="riviere">Rivière</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label>Taille du deck</label>
+                    <div class="setting-selector" id="local-deck-selector">
+                        <button class="setting-btn" data-val="moitie">Moitié</button>
+                        <button class="setting-btn active" data-val="complet">Complet</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label>Main de départ</label>
+                    <div class="setting-selector" id="local-hand-selector">
+                        <button class="setting-btn" data-val="3">3 cartes</button>
+                        <button class="setting-btn active" data-val="5">5 cartes</button>
+                        <button class="setting-btn" data-val="7">7 cartes</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label>Ordre des tours</label>
+                    <div class="setting-selector" id="local-order-selector">
+                        <button class="setting-btn active" data-val="random">Aléatoire</button>
+                        <button class="setting-btn" data-val="order">Dans l'ordre</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-glow" id="btn-close-options">Valider ✓</button>
+        </div>
+    </div>
+
+    <div id="modal-card-detail" class="modal">
+        <div class="modal-content modal-card-detail-content">
+            <div id="card-detail-display"></div>
+            <button id="btn-close-detail" class="btn-outline">Fermer</button>
+        </div>
+    </div>
+
+    <!-- ===== FIN DE PARTIE ===== -->
+    <div id="screen-gameover" class="screen">
+        <div class="gameover-wrapper">
+            <div class="gameover-card">
+                <div class="gameover-crown">👑</div>
+                <h2>Partie terminée !</h2>
+                <div id="final-scores" class="final-scores"></div>
+                <div class="gameover-actions">
+                    <button id="btn-new-game-end" class="btn-glow">Rejouer 🎲</button>
+                    <button id="btn-menu-end" class="btn-outline">Menu principal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/cards-data.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/network.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>
